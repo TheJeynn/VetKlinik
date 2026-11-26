@@ -1,0 +1,42 @@
+@model VetKlinik.Models.Vaccination
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Vaccination</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Pet)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Pet.Name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.VaccineName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.VaccineName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DateGiven)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DateGiven)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.NextDoseDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.NextDoseDate)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

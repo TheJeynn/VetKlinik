@@ -18,7 +18,7 @@ builder.Services.ConfigureApplicationCookie(o => { o.LoginPath = "/Account/Login
 builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, TokenAuthHandler>("McpToken", null);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IBookingService, BookingService>();
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(o => o.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
 builder.Services.AddMcpServer().WithHttpTransport(o => o.Stateless = true).WithToolsFromAssembly();
 
 var app = builder.Build();
