@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ using VetKlinik.Models;
 
 namespace VetKlinik.Controllers
 {
+    [Authorize]
     public class ClinicServicesController : Controller
     {
         private readonly AppDbContext _context;
@@ -46,6 +48,7 @@ namespace VetKlinik.Controllers
         }
 
         // GET: ClinicServices/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["ClinicId"] = new SelectList(_context.Clinics, "Id", "Address");
@@ -57,6 +60,7 @@ namespace VetKlinik.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Id,ClinicId,Name,DurationMinutes,Price")] ClinicService clinicService)
         {
             if (ModelState.IsValid)
@@ -70,6 +74,7 @@ namespace VetKlinik.Controllers
         }
 
         // GET: ClinicServices/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -91,6 +96,7 @@ namespace VetKlinik.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,ClinicId,Name,DurationMinutes,Price")] ClinicService clinicService)
         {
             if (id != clinicService.Id)
@@ -123,6 +129,7 @@ namespace VetKlinik.Controllers
         }
 
         // GET: ClinicServices/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -144,6 +151,7 @@ namespace VetKlinik.Controllers
         // POST: ClinicServices/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var clinicService = await _context.ClinicServices.FindAsync(id);

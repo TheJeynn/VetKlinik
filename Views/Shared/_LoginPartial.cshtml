@@ -1,0 +1,16 @@
+@using Microsoft.AspNetCore.Identity
+@using VetKlinik.Models
+@inject SignInManager<ApplicationUser> SignInManager
+<ul class="navbar-nav align-items-lg-center">
+@if (SignInManager.IsSignedIn(User))
+{
+    var role = User.IsInRole("Admin") ? "Admin" : User.IsInRole("Veteriner") ? "Veteriner" : "Üye";
+    <li class="nav-item"><span class="nav-link"><i class="bi bi-person-circle"></i> @User.Identity!.Name <span class="badge bg-light text-dark">@role</span></span></li>
+    <li class="nav-item"><form asp-controller="Account" asp-action="Logout" method="post" class="d-inline"><button class="btn btn-sm btn-outline-light ms-lg-2">Çıkış</button></form></li>
+}
+else
+{
+    <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Register">Kayıt Ol</a></li>
+    <li class="nav-item"><a class="btn btn-sm btn-light ms-lg-2" asp-controller="Account" asp-action="Login">Giriş</a></li>
+}
+</ul>

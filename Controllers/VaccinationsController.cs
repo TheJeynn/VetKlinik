@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,155 +8,90 @@ using VetKlinik.Models;
 
 namespace VetKlinik.Controllers
 {
-    public class VaccinationsController : Controller
+    [Authorize]
+    public class VaccinationsController(AppDbContext _context) : Controller
     {
-        private readonly AppDbContext _context;
+        string Uid => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        bool Staff => User.IsInRole("Admin") || User.IsInRole("Veteriner");
 
-        public VaccinationsController(AppDbContext context)
+        IQueryable<Vaccination> Scoped()
         {
-            _context = context;
+            var q = _context.Vaccinations.Include(v => v.Pet).AsQueryable();
+            return Staff ? q : q.Where(v => v.Pet.OwnerId == Uid);
         }
 
-        // GET: Vaccinations
-        public async Task<IActionResult> Index()
-        {
-            var appDbContext = _context.Vaccinations.Include(v => v.Pet);
-            return View(await appDbContext.ToListAsync());
-        }
+        void Pets(int? sel = null) => ViewData["PetId"] = new SelectList(_context.Pets.ToList(), "Id", "Name", sel);
 
-        // GET: Vaccinations/Details/5
+        public async Task<IActionResult> Index() => View(await Scoped().OrderBy(v => v.Pet.Name).ThenBy(v => v.DateGiven).ToListAsync());
+
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var vaccination = await _context.Vaccinations
-                .Include(v => v.Pet)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (vaccination == null)
-            {
-                return NotFound();
-            }
-
-            return View(vaccination);
+            if (id == null) return NotFound();
+            var v = await Scoped().FirstOrDefaultAsync(x => x.Id == id);
+            return v == null ? NotFound() : View(v);
         }
 
-        // GET: Vaccinations/Create
-        public IActionResult Create()
-        {
-            ViewData["PetId"] = new SelectList(_context.Pets, "Id", "Name");
-            return View();
-        }
+        [Authorize(Roles = "Admin,Veteriner")]
+        public IActionResult Create() { Pets(); return View(); }
 
-        // POST: Vaccinations/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,PetId,VaccineName,DateGiven,NextDoseDate")] Vaccination vaccination)
+        [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = "Admin,Veteriner")]
+        public async Task<IActionResult> Create([Bind("PetId,VaccineName,DateGiven,NextDoseDate")] Vaccination v)
         {
+            ModelState.Remove(nameof(Vaccination.Pet));
             if (ModelState.IsValid)
             {
-                _context.Add(vaccination);
+                _context.Add(v);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PetId"] = new SelectList(_context.Pets, "Id", "Name", vaccination.PetId);
-            return View(vaccination);
+            Pets(v.PetId);
+            return View(v);
         }
 
-        // GET: Vaccinations/Edit/5
+        [Authorize(Roles = "Admin,Veteriner")]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var vaccination = await _context.Vaccinations.FindAsync(id);
-            if (vaccination == null)
-            {
-                return NotFound();
-            }
-            ViewData["PetId"] = new SelectList(_context.Pets, "Id", "Name", vaccination.PetId);
-            return View(vaccination);
+            if (id == null) return NotFound();
+            var v = await Scoped().FirstOrDefaultAsync(x => x.Id == id);
+            if (v == null) return NotFound();
+            Pets(v.PetId);
+            return View(v);
         }
 
-        // POST: Vaccinations/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,PetId,VaccineName,DateGiven,NextDoseDate")] Vaccination vaccination)
+        [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = "Admin,Veteriner")]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,PetId,VaccineName,DateGiven,NextDoseDate")] Vaccination form)
         {
-            if (id != vaccination.Id)
-            {
-                return NotFound();
-            }
-
+            if (id != form.Id) return NotFound();
+            var v = await Scoped().FirstOrDefaultAsync(x => x.Id == id);
+            if (v == null) return NotFound();
+            ModelState.Remove(nameof(Vaccination.Pet));
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(vaccination);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!VaccinationExists(vaccination.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                v.PetId = form.PetId; v.VaccineName = form.VaccineName;
+                v.DateGiven = form.DateGiven; v.NextDoseDate = form.NextDoseDate;
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PetId"] = new SelectList(_context.Pets, "Id", "Name", vaccination.PetId);
-            return View(vaccination);
+            Pets(form.PetId);
+            return View(form);
         }
 
-        // GET: Vaccinations/Delete/5
+        [Authorize(Roles = "Admin,Veteriner")]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var vaccination = await _context.Vaccinations
-                .Include(v => v.Pet)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (vaccination == null)
-            {
-                return NotFound();
-            }
-
-            return View(vaccination);
+            if (id == null) return NotFound();
+            var v = await Scoped().FirstOrDefaultAsync(x => x.Id == id);
+            return v == null ? NotFound() : View(v);
         }
 
-        // POST: Vaccinations/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+        [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken, Authorize(Roles = "Admin,Veteriner")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var vaccination = await _context.Vaccinations.FindAsync(id);
-            if (vaccination != null)
-            {
-                _context.Vaccinations.Remove(vaccination);
-            }
-
+            var v = await Scoped().FirstOrDefaultAsync(x => x.Id == id);
+            if (v == null) return NotFound();
+            _context.Vaccinations.Remove(v);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool VaccinationExists(int id)
-        {
-            return _context.Vaccinations.Any(e => e.Id == id);
         }
     }
 }

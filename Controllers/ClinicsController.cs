@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ using VetKlinik.Models;
 
 namespace VetKlinik.Controllers
 {
+    [Authorize]
     public class ClinicsController : Controller
     {
         private readonly AppDbContext _context;
@@ -44,6 +46,7 @@ namespace VetKlinik.Controllers
         }
 
         // GET: Clinics/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -54,6 +57,7 @@ namespace VetKlinik.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Id,Name,Address,Phone,OpenTime,CloseTime")] Clinic clinic)
         {
             if (ModelState.IsValid)
@@ -66,6 +70,7 @@ namespace VetKlinik.Controllers
         }
 
         // GET: Clinics/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -86,6 +91,7 @@ namespace VetKlinik.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Address,Phone,OpenTime,CloseTime")] Clinic clinic)
         {
             if (id != clinic.Id)
@@ -117,6 +123,7 @@ namespace VetKlinik.Controllers
         }
 
         // GET: Clinics/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -137,6 +144,7 @@ namespace VetKlinik.Controllers
         // POST: Clinics/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var clinic = await _context.Clinics.FindAsync(id);

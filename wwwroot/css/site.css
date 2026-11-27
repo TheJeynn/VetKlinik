@@ -1,31 +1,18 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
-body {
-  margin-bottom: 60px;
-}
-
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
-}
-
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
-}
+:root { --vet:#0f766e; --vet-dark:#115e59; }
+body { background:#f3f7f6; }
+.vet-nav { background:linear-gradient(90deg,#0f766e,#14b8a6); box-shadow:0 2px 10px rgba(0,0,0,.15); }
+.vet-nav .nav-link, .vet-nav .navbar-brand { color:rgba(255,255,255,.92)!important; }
+.vet-nav .nav-link:hover { color:#fff!important; }
+.vet-nav .dropdown-menu { border:0; box-shadow:0 8px 24px rgba(0,0,0,.15); }
+.page-title { font-weight:700; color:var(--vet-dark); }
+.card { border:0; border-radius:14px; }
+.table thead th { font-weight:600; color:#475569; }
+.btn-success, .btn-primary { background:var(--vet); border-color:var(--vet); }
+.btn-success:hover, .btn-primary:hover { background:var(--vet-dark); border-color:var(--vet-dark); }
+.form-group { margin-bottom:1rem; }
+main .row > .col-md-4 form, main .row > .col-md-5 form { background:#fff; padding:1.5rem; border-radius:14px; box-shadow:0 2px 12px rgba(0,0,0,.06); }
+main > div > dl.row { background:#fff; padding:1.2rem; border-radius:14px; box-shadow:0 2px 12px rgba(0,0,0,.06); }
+.hero { background:linear-gradient(135deg,#0f766e,#14b8a6); }
+.feature-card { transition:transform .15s; } .feature-card:hover { transform:translateY(-4px); }
+.stat-card .icon { width:52px; height:52px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; }
+.site-footer { background:#fff; border-top:1px solid #e2e8f0; }

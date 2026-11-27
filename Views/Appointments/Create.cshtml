@@ -4,25 +4,26 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<h2 class="page-title">Yeni Kayıt</h2>
 
-<h4>Appointment</h4>
+<h4>Randevu</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+@if (!((IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.PetId).Any()) { <div class="alert alert-warning">Randevu için önce <a asp-controller="Pets" asp-action="Create">hayvanınızı ekleyin</a>.</div> }
             <div class="form-group">
                 <label asp-for="PetId" class="control-label"></label>
-                <select asp-for="PetId" class ="form-control" asp-items="ViewBag.PetId"></select>
+                <select asp-for="PetId" class="form-select" asp-items="ViewBag.PetId"><option value="">-- Seçiniz --</option></select>
             </div>
             <div class="form-group">
                 <label asp-for="ClinicServiceId" class="control-label"></label>
-                <select asp-for="ClinicServiceId" class ="form-control" asp-items="ViewBag.ClinicServiceId"></select>
+                <select asp-for="ClinicServiceId" class="form-select" asp-items="ViewBag.ClinicServiceId"><option value="">-- Seçiniz --</option></select>
             </div>
             <div class="form-group">
                 <label asp-for="VetId" class="control-label"></label>
-                <select asp-for="VetId" class ="form-control" asp-items="ViewBag.VetId"></select>
+                <select asp-for="VetId" class="form-select" asp-items="ViewBag.VetId"><option value="">-- Seçiniz --</option></select>
             </div>
             <div class="form-group">
                 <label asp-for="Start" class="control-label"></label>
@@ -35,14 +36,14 @@
                 <span asp-validation-for="ExamNote" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Kaydet" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Listeye Dön</a>
 </div>
 
 @section Scripts {

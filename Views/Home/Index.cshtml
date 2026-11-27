@@ -1,8 +1,20 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@{ ViewData["Title"] = "Ana Sayfa"; var auth = User.Identity?.IsAuthenticated == true; }
+<div class="hero text-center text-white rounded-4 p-5 mb-4 shadow">
+    <h1 class="display-5 fw-bold">🐾 VetKlinik</h1>
+    <p class="lead mb-4">Veteriner randevu ve hasta takip sistemi</p>
+    @if (!auth)
+    {
+        <a asp-controller="Account" asp-action="Login" class="btn btn-light btn-lg me-2">Giriş Yap</a>
+        <a asp-controller="Account" asp-action="Register" class="btn btn-outline-light btn-lg">Kayıt Ol</a>
+    }
+    else
+    {
+        <a asp-controller="Appointments" asp-action="Create" class="btn btn-light btn-lg me-2"><i class="bi bi-calendar-plus"></i> Randevu Al</a>
+        <a asp-controller="Pets" asp-action="Index" class="btn btn-outline-light btn-lg"><i class="bi bi-heart-fill"></i> Hayvanlarım</a>
+    }
+</div>
+<div class="row g-4">
+    <div class="col-md-4"><div class="card feature-card shadow-sm h-100 text-center p-4"><div class="fs-1 text-success"><i class="bi bi-calendar-check"></i></div><h5 class="mt-2">Kolay Randevu</h5><p class="text-muted mb-0">Hizmet süresine ve hekim müsaitliğine göre çakışmasız randevu.</p></div></div>
+    <div class="col-md-4"><div class="card feature-card shadow-sm h-100 text-center p-4"><div class="fs-1 text-success"><i class="bi bi-heart-pulse"></i></div><h5 class="mt-2">Hasta Takibi</h5><p class="text-muted mb-0">Evcil hayvanlarınızın bilgileri ve muayene notları tek yerde.</p></div></div>
+    <div class="col-md-4"><div class="card feature-card shadow-sm h-100 text-center p-4"><div class="fs-1 text-success"><i class="bi bi-shield-check"></i></div><h5 class="mt-2">Aşı Takvimi</h5><p class="text-muted mb-0">Geçmiş ve yaklaşan aşıları görün, tarih kaçırmayın.</p></div></div>
 </div>

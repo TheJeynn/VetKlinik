@@ -1,53 +1,30 @@
 @model IEnumerable<VetKlinik.Models.ClinicService>
-
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Hizmetler";
+    var admin = User.IsInRole("Admin");
+    var staff = admin || User.IsInRole("Veteriner");
 }
-
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Clinic)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DurationMinutes)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Price)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="page-title mb-0"><i class="bi bi-bandaid"></i> Hizmetler</h2>
+    @if (admin) { <a asp-action="Create" class="btn btn-success"><i class="bi bi-plus-lg"></i> Yeni Ekle</a> }
+</div>
+<div class="card shadow-sm"><div class="table-responsive">
+<table class="table table-hover align-middle mb-0">
+    <thead class="table-light"><tr><th>Hizmet</th><th>Süre</th><th>Ücret</th><th></th></tr></thead>
     <tbody>
-@foreach (var item in Model) {
+    @foreach (var item in Model)
+    {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Clinic.Address)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DurationMinutes)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            <td>@item.Name</td><td>@item.DurationMinutes dk</td><td>@item.Price.ToString("N2") ₺</td>
+            <td class="text-end text-nowrap">
+                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary" title="Detay"><i class="bi bi-eye"></i></a>
+                @if (admin)
+                {
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="Düzenle"><i class="bi bi-pencil"></i></a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Sil"><i class="bi bi-trash"></i></a>
+                }
             </td>
         </tr>
-}
+    }
     </tbody>
-</table>
+</table></div></div>

@@ -1,0 +1,51 @@
+@using VetKlinik.Controllers
+@using VetKlinik.Models
+@model List<RevenueRow>
+@{
+    ViewData["Title"] = "Yönetim Paneli";
+    var recent = (List<Appointment>)ViewBag.Recent;
+    var stats = new List<(string Label, int Value, string Icon, string Color)> {
+        ("Kullanıcı", (int)ViewBag.Users, "people", "primary"),
+        ("Hayvan", (int)ViewBag.Pets, "heart-fill", "danger"),
+        ("Bekleyen Randevu", (int)ViewBag.Pending, "hourglass-split", "warning"),
+        ("Bugünkü Randevu", (int)ViewBag.Today, "calendar-day", "success") };
+}
+<h2 class="page-title mb-3"><i class="bi bi-speedometer2"></i> Yönetim Paneli</h2>
+<div class="row g-3 mb-4">
+@foreach (var s in stats)
+{
+    <div class="col-6 col-lg-3"><div class="card stat-card shadow-sm"><div class="card-body d-flex align-items-center">
+        <div class="icon bg-@s.Color-subtle text-@s.Color"><i class="bi bi-@s.Icon"></i></div>
+        <div class="ms-3"><div class="text-muted small">@s.Label</div><div class="fs-3 fw-bold">@s.Value</div></div>
+    </div></div></div>
+}
+</div>
+<div class="row g-4">
+    <div class="col-lg-6"><div class="card shadow-sm"><div class="card-body">
+        <h5 class="mb-3">Hizmet Bazlı Gelir <small class="text-muted">(onaylı ve tamamlanan)</small></h5>
+        <table class="table table-sm align-middle mb-0">
+            <thead><tr><th>Hizmet</th><th>Adet</th><th class="text-end">Toplam</th></tr></thead>
+            <tbody>
+            @foreach (var r in Model) { <tr><td>@r.Service</td><td>@r.Count</td><td class="text-end">@r.Total.ToString("N2") ₺</td></tr> }
+            @if (!Model.Any()) { <tr><td colspan="3" class="text-muted">Henüz onaylanmış randevu yok.</td></tr> }
+            </tbody>
+            <tfoot><tr class="fw-bold"><td colspan="2">Genel Toplam</td><td class="text-end">@(((decimal)ViewBag.Total).ToString("N2")) ₺</td></tr></tfoot>
+        </table>
+    </div></div></div>
+    <div class="col-lg-6"><div class="card shadow-sm"><div class="card-body">
+        <h5 class="mb-3">Son Randevular</h5>
+        <table class="table table-sm align-middle mb-0">
+            <thead><tr><th>Hayvan</th><th>Hizmet</th><th>Tarih</th><th>Durum</th></tr></thead>
+            <tbody>
+            @foreach (var a in recent) { <tr><td>@a.Pet.Name</td><td>@a.ClinicService.Name</td><td>@a.Start.ToString("dd.MM HH:mm")</td><td>@a.Status</td></tr> }
+            </tbody>
+        </table>
+    </div></div></div>
+</div>
+<div class="mt-4 d-flex flex-wrap gap-2">
+    <a asp-action="Users" class="btn btn-success"><i class="bi bi-people"></i> Kullanıcılar</a>
+    <a asp-controller="Clinics" asp-action="Index" class="btn btn-outline-success">Klinikler</a>
+    <a asp-controller="ClinicServices" asp-action="Index" class="btn btn-outline-success">Hizmetler</a>
+    <a asp-controller="Vets" asp-action="Index" class="btn btn-outline-success">Veterinerler</a>
+    <a asp-controller="Appointments" asp-action="Index" class="btn btn-outline-success">Randevular</a>
+</div>

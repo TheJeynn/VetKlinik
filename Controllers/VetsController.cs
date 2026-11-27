@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ using VetKlinik.Models;
 
 namespace VetKlinik.Controllers
 {
+    [Authorize]
     public class VetsController : Controller
     {
         private readonly AppDbContext _context;
@@ -47,6 +49,7 @@ namespace VetKlinik.Controllers
         }
 
         // GET: Vets/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["ClinicId"] = new SelectList(_context.Clinics, "Id", "Address");
@@ -59,6 +62,7 @@ namespace VetKlinik.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Id,ClinicId,FullName,Specialties,UserId")] Vet vet)
         {
             if (ModelState.IsValid)
@@ -73,6 +77,7 @@ namespace VetKlinik.Controllers
         }
 
         // GET: Vets/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -95,6 +100,7 @@ namespace VetKlinik.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,ClinicId,FullName,Specialties,UserId")] Vet vet)
         {
             if (id != vet.Id)
@@ -128,6 +134,7 @@ namespace VetKlinik.Controllers
         }
 
         // GET: Vets/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -150,6 +157,7 @@ namespace VetKlinik.Controllers
         // POST: Vets/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var vet = await _context.Vets.FindAsync(id);

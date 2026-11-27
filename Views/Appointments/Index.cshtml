@@ -1,89 +1,40 @@
 @model IEnumerable<VetKlinik.Models.Appointment>
-
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Randevular";
+    var staff = User.IsInRole("Admin") || User.IsInRole("Veteriner");
+    string Badge(AppointmentStatus s) => s switch { AppointmentStatus.Bekliyor => "warning text-dark", AppointmentStatus.Onaylandi => "success", AppointmentStatus.Reddedildi => "danger", _ => "secondary" };
 }
-
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Pet)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ClinicService)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Vet)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Start)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.End)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DurationMinutes)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Price)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ExamNote)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RejectReason)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="page-title mb-0"><i class="bi bi-calendar-check"></i> Randevular</h2>
+    <a asp-action="Create" class="btn btn-success"><i class="bi bi-plus-lg"></i> Yeni Randevu</a>
+</div>
+<div class="card shadow-sm"><div class="table-responsive">
+<table class="table table-hover align-middle mb-0">
+    <thead class="table-light"><tr><th>Hayvan</th><th>Hizmet</th><th>Hekim</th><th>Tarih</th><th>Süre</th><th>Ücret</th><th>Durum</th><th></th></tr></thead>
     <tbody>
-@foreach (var item in Model) {
+    @foreach (var a in Model)
+    {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Pet.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ClinicService.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Vet.FullName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Start)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.End)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DurationMinutes)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ExamNote)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RejectReason)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            <td>@a.Pet.Name</td><td>@a.ClinicService.Name</td><td>@a.Vet.FullName</td>
+            <td>@a.Start.ToString("dd.MM.yyyy HH:mm")</td><td>@a.DurationMinutes dk</td><td>@a.Price.ToString("N2") ₺</td>
+            <td><span class="badge bg-@Badge(a.Status)">@a.Status</span>@if (!string.IsNullOrEmpty(a.RejectReason)) { <div class="small text-danger">@a.RejectReason</div> }</td>
+            <td class="text-end">
+                <a asp-action="Details" asp-route-id="@a.Id" class="btn btn-sm btn-outline-secondary"><i class="bi bi-eye"></i></a>
+                @if (staff)
+                {
+                    <a asp-action="Edit" asp-route-id="@a.Id" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                    @if (a.Status == AppointmentStatus.Bekliyor)
+                    {
+                        <form asp-action="Approve" asp-route-id="@a.Id" method="post" class="d-inline"><button class="btn btn-sm btn-success">Onayla</button></form>
+                        <form asp-action="Reject" asp-route-id="@a.Id" method="post" class="input-group input-group-sm mt-1"><input name="reason" class="form-control" placeholder="Red nedeni" required /><button class="btn btn-outline-danger">Reddet</button></form>
+                    }
+                }
+                else if (a.Status == AppointmentStatus.Bekliyor)
+                {
+                    <a asp-action="Delete" asp-route-id="@a.Id" class="btn btn-sm btn-outline-danger">İptal</a>
+                }
             </td>
         </tr>
-}
+    }
     </tbody>
-</table>
+</table></div></div>
