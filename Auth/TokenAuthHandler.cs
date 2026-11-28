@@ -20,8 +20,13 @@ public class TokenAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> o, IL
         var hash = Hash(h[7..].Trim());
         var t = await db.McpTokens.Include(x => x.User).FirstOrDefaultAsync(x => x.TokenHash == hash);
         if (t is null) return AuthenticateResult.Fail("Geçersiz token");
-        var id = new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, t.UserId),
-                                     new Claim(ClaimTypes.Name, t.User.UserName!)], Scheme.Name);
+
+        var claims = new List<Claim> { new(ClaimTypes.NameIdentifier, t.UserId), new(ClaimTypes.Name, t.User.UserName!) };
+        var roles = await (from ur in db.UserRoles join r in db.Roles on ur.RoleId equals r.Id
+                           where ur.UserId == t.UserId select r.Name).ToListAsync();
+        claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r!)));
+
+        var id = new ClaimsIdentity(claims, Scheme.Name);
         return AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(id), Scheme.Name));
     }
 }

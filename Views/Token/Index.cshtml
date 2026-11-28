@@ -1,0 +1,34 @@
+@model List<DateTime>
+@{
+    ViewData["Title"] = "API / MCP Token";
+    var baseUrl = $"{Context.Request.Scheme}://{Context.Request.Host}";
+    var newToken = TempData["NewToken"] as string;
+}
+<h2 class="page-title mb-3"><i class="bi bi-key"></i> API / MCP Token</h2>
+<div class="row g-4">
+    <div class="col-lg-6"><div class="card shadow-sm"><div class="card-body">
+        <h5>Token üret</h5>
+        <p class="text-muted">Token ile REST API ve MCP ucuna <b>sizin yetkilerinizle</b> erişilir. Token yalnızca üretildiğinde bir kez gösterilir.</p>
+        @if (newToken != null)
+        {
+            <div class="alert alert-success"><div class="small mb-1">Yeni token (şimdi kopyalayın):</div><code class="user-select-all d-block text-break">@newToken</code></div>
+        }
+        <form asp-action="Generate" method="post" class="d-inline"><button class="btn btn-success"><i class="bi bi-plus-lg"></i> Yeni token üret</button></form>
+        <form asp-action="Revoke" method="post" class="d-inline" onsubmit="return confirm('Tüm token''lar iptal edilsin mi?')"><button class="btn btn-outline-danger">Hepsini iptal et</button></form>
+        <hr />
+        <div class="small text-muted">Aktif token sayısı: <b>@Model.Count</b>@if (Model.Any()) { <text> (son üretim: @Model.First().ToString("dd.MM.yyyy HH:mm"))</text> }</div>
+    </div></div></div>
+    <div class="col-lg-6"><div class="card shadow-sm"><div class="card-body">
+        <h5>Kullanım</h5>
+        <p class="mb-1"><b>MCP adresi:</b> <code>@baseUrl/mcp</code></p>
+        <p class="mb-1"><b>Başlık:</b> <code>Authorization: Bearer &lt;token&gt;</code></p>
+        <p class="mb-2"><b>REST API:</b> <code>@baseUrl/api/services</code></p>
+        <h6 class="mt-3">MCP araçları</h6>
+        <ul class="mb-0">
+            <li><code>hizmetleri_listele</code>: hizmet, süre, ücret</li>
+            <li><code>uygun_saatler</code>: gün ve hizmete göre boş saatler</li>
+            <li><code>asi_takvimi</code>: hayvanınızın aşı takvimi</li>
+            <li><code>randevu_olustur</code>: randevu oluşturur (yazma)</li>
+        </ul>
+    </div></div></div>
+</div>

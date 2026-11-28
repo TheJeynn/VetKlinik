@@ -14,7 +14,13 @@ builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlite($"Data Source={dbPa
     o.Password.RequireUppercase = false; o.Password.RequireNonAlphanumeric = false;
     o.User.RequireUniqueEmail = true;
 }).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
-builder.Services.ConfigureApplicationCookie(o => { o.LoginPath = "/Account/Login"; o.AccessDeniedPath = "/Account/AccessDenied"; });
+builder.Services.ConfigureApplicationCookie(o =>
+{
+    o.LoginPath = "/Account/Login";
+    o.AccessDeniedPath = "/Account/AccessDenied";
+    o.Events.OnRedirectToLogin = c => { if (c.Request.Path.StartsWithSegments("/api")) c.Response.StatusCode = 401; else c.Response.Redirect(c.RedirectUri); return Task.CompletedTask; };
+    o.Events.OnRedirectToAccessDenied = c => { if (c.Request.Path.StartsWithSegments("/api")) c.Response.StatusCode = 403; else c.Response.Redirect(c.RedirectUri); return Task.CompletedTask; };
+});
 builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, TokenAuthHandler>("McpToken", null);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IBookingService, BookingService>();
